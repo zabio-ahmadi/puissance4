@@ -1,9 +1,0 @@
-puissance4: 
-	@echo "first rule which must create the puissance4 executable"
-
-clean:
-	@echo "this rule must clean everything up (including candidate files in testbed)"
-	$(MAKE) -C testbed clean
-
-tests: puissance4
-	$(MAKE) -C testbed
