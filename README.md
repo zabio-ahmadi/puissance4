@@ -16,6 +16,11 @@ make tests
 
 ## NOTES
 
+```diff
+- one test from smart_ai not passed (test no:4)
++ the chart (one before the end) doesn't math the reference  
+```
+
 
 ## Author
 
