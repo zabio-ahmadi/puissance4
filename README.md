@@ -8,11 +8,14 @@
 make
 ```
 
-## test
+## to TEST
 
 ```sh
 make tests
 ```
+
+## NOTES
+
 
 ## Author
 

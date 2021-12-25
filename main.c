@@ -18,7 +18,7 @@ int main(int argc, char **argv){
 
     //if(argc <=3 || row <= 3 || col <= 3)
     if(argc <= 3){
-        invalid_param(argc, argv);
+        invalid_param(argv);
         return EXIT_FAILURE;
     }
 
@@ -35,17 +35,17 @@ int main(int argc, char **argv){
 
     switch (mod){
     case 1:
-        play_agaist_random(&_board, col, turn);
+        play_agaist_random_ai(&_board, col, turn);
         break;
-    // case 2:
-    //     play_against_ai(&_board, row, col, turn);
-    //     break;
+    case 2:
+        play_against_smart_ai2(&_board, col, turn);
+        break;
     case 3:
         play_tow_player(&_board, col, turn);
         break;
 
     default:
-        invalid_param(argc, argv);
+        invalid_param(argv);
         break;
     }
     

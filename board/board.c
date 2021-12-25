@@ -11,7 +11,7 @@ void board_alloc(board *_board, int row, int col){
     _board->col = col; 
 
     _board->matrix = malloc( row * sizeof(char *));
-    _board->col_index = malloc(row * sizeof(int));
+    _board->col_index = malloc(col * sizeof(int));
 
     for(int i = 0; i < row; i++){
         // size of char is 8 
@@ -84,9 +84,8 @@ void print_board(board *_board){
                         }else {                          
                             if((int)_board->matrix[i/2][j/2] > 65){
 
-                                (_board->matrix[i/2][j/2] == 'X')? printInColor("green", ""):printInColor("red", "");
                                 printf("%c", _board->matrix[i/2][j/2]);
-                                printInColor("white", "");
+                                
 
                             }else {
                                 printf(" ");
@@ -113,10 +112,12 @@ void print_board(board *_board){
     for(int i = 1; i <= _board->col; i++){
         if(i == 1)
             printf(" %d ", i % 10);
-        else 
+        else if(i + 1 > _board->col)
+            printf("%d", i % 10);
+        else
             printf("%d ", i % 10);
     }
-    printf("\n\n");
+    printf("\n");
 
    
     
@@ -229,6 +230,240 @@ bool check_col(board *_board, int column){
 
 
 }
+
+
+int predit_col_win(board *_board){
+   
+    //predict forward diagonal (forward diagonal have priority)
+    for (int col = 0; col < _board->col; col++){
+
+        for(int row = _board->row -1; row >= 0; row--){
+
+            int x_count = 0; 
+            int o_count = 0;    
+            int cols = col; 
+            int rows = row; 
+            // look up 
+            while(cols <= _board->col && rows >= 0){
+
+                if(_board->matrix[rows][cols] == 'O'){
+                    o_count++;
+                    x_count = 0; 
+                }
+                if(_board->matrix[rows][cols] == 'X'){
+                    x_count++;
+                    o_count = 0; 
+                }   
+
+                if(( o_count == 3) && ((int)_board->matrix[rows-1][cols +1] < 65 && (int)_board->matrix[rows][cols+1] > 65 )){
+                    return cols + 1;
+                    // break;
+                }
+                rows--;
+                cols++;
+            }
+        }
+    }
+
+    //predict col 
+    for (int col = 0; col < _board->col; col++){
+        int x_count = 0; 
+        int o_count = 0; 
+        for(int row = _board->row -1; row >= 0; row--){
+
+            if(_board->matrix[row][col] == 'O'){
+                o_count++;
+                x_count = 0; 
+            }
+            if(_board->matrix[row][col] == 'X'){
+                x_count++;
+                o_count = 0; 
+            }   
+        }
+
+        if(o_count == 3){
+            return col; 
+        }
+    }
+
+
+    // predict rows 
+    for(int row = 0; row < _board->row; row++){
+    
+        for (int col = 0; col < _board->col; col++){
+
+            int o_count = 0; 
+
+            if(_board->matrix[row][col] < 65){
+
+                int column = col - 1;
+                //check left  
+                while(column >= 0){
+
+                    if(_board->matrix[row][column] == 'O'){
+                        o_count++;
+                    }
+                    else {
+                        break;
+                    }
+
+                    if(o_count == 3){
+                        return col; 
+                    }
+                    column--;
+                }
+
+                column = col + 1; 
+                while(column < _board->col){
+
+                    if(_board->matrix[row][column] == 'O'){
+                        o_count++;
+                    }
+                    else {
+                        break;
+                    }
+
+                    if(o_count == 3){
+                        return col; 
+                    }
+                    column++;
+                }  
+            }
+
+        }
+    }  
+    
+    return -1;
+
+}
+
+
+
+
+int predit_col_loss(board *_board){
+    //predict columns 
+    for (int col = 0; col < _board->col; col++){
+        int x_count = 0; 
+        int o_count = 0; 
+        for(int row = _board->row -1; row >= 0; row--){
+
+            if(_board->matrix[row][col] == 'O'){
+                o_count++;
+                x_count = 0; 
+            }
+            if(_board->matrix[row][col] == 'X'){
+                x_count++;
+                o_count = 0; 
+            }   
+        }
+        if(x_count == 3){
+            return col; 
+        }
+    }
+
+
+    // predict rows 
+    for(int row = _board->row -1; row >= 0; row--){
+    
+        for (int col = 0; col < _board->col; col++){
+
+            int x_count = 0; 
+            int o_count = 0; 
+
+            if(_board->matrix[row][col] < 65){
+
+                
+                int column = col - 1;
+                //check left  
+                while(column >= 0){
+
+                    if(_board->matrix[row][column] == 'O'){
+                        o_count++;
+                        x_count = 0; 
+                    }
+                    else if(_board->matrix[row][column] == 'X'){
+                        x_count++;
+                        o_count = 0; 
+                    }
+                    else {
+                        break;
+                    }
+
+                    if((x_count == 3) && (row+1 < _board->row) && ((int)_board->matrix[row+1][col] > 65)){
+                        return col; 
+                    }
+                    column--;
+                }
+
+
+                 //check right
+                 column = col + 1;  
+                while(column < _board->col){
+
+                    if(_board->matrix[row][column] == 'O'){
+                        o_count++;
+                        x_count = 0; 
+                    }
+                    else if(_board->matrix[row][column] == 'X'){
+                        x_count++;
+                        o_count = 0; 
+                    }
+                    else {
+                        break;
+                    }
+
+                    // if((x_count == 3 || o_count == 3) && (row+1 < _board->row) && ((int)_board->matrix[col][row+1] > 65)){
+                    //     return col; 
+                    // }
+
+                    if((x_count == 3)&& (row+1 < _board->row) && ((int)_board->matrix[row+1][col] > 65)){
+                        return col; 
+                    }
+                    column++;
+                }
+                
+            }
+
+        }
+    }  
+    
+
+
+    // predict forward diagonal 
+    for (int col = 0; col < _board->col; col++){
+
+        for(int row = _board->row -1; row >= 0; row--){
+
+            int x_count = 0; 
+            int o_count = 0;    
+            int cols = col; 
+            int rows = row; 
+            // look up 
+            while(cols <= _board->col && rows >= 0){
+
+                if(_board->matrix[rows][cols] == 'O'){
+                    o_count++;
+                    x_count = 0; 
+                }
+                if(_board->matrix[rows][cols] == 'X'){
+                    x_count++;
+                    o_count = 0; 
+                }   
+
+                if((x_count == 3 || o_count == 3) && ((int)_board->matrix[rows-1][cols +1] < 65 && (int)_board->matrix[rows][cols+1] > 65 )){
+                    return cols + 1;
+                    // break;
+                }
+                rows--;
+                cols++;
+            }
+        }
+    }
+    
+    return -1;
+
+}
+
 
 
 bool check_diagonal_forward(board *_board){

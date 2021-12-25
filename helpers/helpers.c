@@ -36,7 +36,7 @@ void flush_input() {
     while ((c = getchar()) != '\n' && c != EOF); 
 }
 
-void invalid_param(int argc, char **argv){
+void invalid_param(char **argv){
     printf("\n\nUsage: %s -m<mode> -d<row> -d<col>\n", argv[0]);
     printf("mode  specifies the mode: \n");
     printf("[1] : single player game (random)\n");

@@ -33,6 +33,10 @@ bool check_row(board *_board, int column);
 
 bool check_col(board *_board, int column);
 
+int predit_col_win(board *_board);
+
+int predit_col_loss(board *_board);
+
 bool check_diagonal_forward(board *_board);
 
 bool check_diagonal_backward(board *_board);
